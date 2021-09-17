@@ -1330,6 +1330,11 @@
     "@typescript-eslint/types" "4.31.1"
     eslint-visitor-keys "^2.0.0"
 
+"@vicons/fluent@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.nlark.com/@vicons/fluent/download/@vicons/fluent-0.11.0.tgz#84f3cda255539cb96f45c89c1601e2892d79826f"
+  integrity sha1-hPPNolVTnLlvRcicFgHiiS15gm8=
+
 "@vue/babel-helper-vue-jsx-merge-props@^1.2.1":
   version "1.2.1"
   resolved "https://registry.npm.taobao.org/@vue/babel-helper-vue-jsx-merge-props/download/@vue/babel-helper-vue-jsx-merge-props-1.2.1.tgz#31624a7a505fb14da1d58023725a4c5f270e6a81"
