@@ -8,25 +8,30 @@
       class="toolbar"
       bordered
     >
-      <tool-bar/>
+      <tool-bar />
     </n-layout-header>
     <n-layout position="absolute">
-      <n-layout-header class="address-bar">地址/搜索</n-layout-header>
-      <n-layout has-sider position="absolute">
+      <n-layout-header class="address-bar" bordered>
+        <path-bar />
+      </n-layout-header>
+      <n-layout
+        has-sider
+        position="absolute"
+      >
         <n-layout-sider
           bordered
-          :native-scrollbar="false"
           collapse-mode="transform"
           :collapsed-width="0"
           :show-collapsed-content="false"
           show-trigger="bar"
-        >列表
+        >
+          <file-tree-view />
         </n-layout-sider>
         <n-layout-content
           content-style="padding: 24px"
           :native-scrollbar="false"
         >
-          <router-view/>
+          <router-view />
         </n-layout-content>
       </n-layout>
       <n-layout-footer>
@@ -37,12 +42,14 @@
 </template>
 
 <script lang="ts">
-import ToolBar from '../components/ToolBar.vue'
-import { defineComponent } from 'vue'
+import ToolBar from '../components/layout/ToolBar.vue'
+import {defineComponent} from 'vue'
+import PathBar from "../components/layout/PathBar.vue";
+import FileTreeView from "./file/FileTreeView.vue";
 
 export default defineComponent({
   name: 'FileLayout',
-  components: { ToolBar },
+  components: {FileTreeView, PathBar, ToolBar},
 })
 </script>
 

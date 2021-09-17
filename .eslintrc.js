@@ -1,3 +1,4 @@
+/* eslint-disable */
 module.exports = {
   root: true,
   env: {
@@ -10,8 +11,8 @@ module.exports = {
     ecmaVersion: 2020,
     sourceType: 'module',
     ecmaFeatures: {
-      jsx: true
-    }
+      jsx: true,
+    },
   },
   extends: [
     'eslint:recommended',

@@ -2,6 +2,7 @@ import {
   create,
   NLayout, NLayoutContent, NLayoutFooter, NLayoutHeader, NLayoutSider,
   NSpace, NButton, NDivider, NIcon, NButtonGroup, NMessageProvider, NDropdown,
+  NBreadcrumb, NBreadcrumbItem, NInput, NInputGroup, NTree,
 } from 'naive-ui'
 
 export default create({
@@ -18,5 +19,10 @@ export default create({
     NIcon,
     NMessageProvider,
     NDropdown,
+    NBreadcrumb,
+    NBreadcrumbItem,
+    NInput,
+    NInputGroup,
+    NTree,
   ],
 })
