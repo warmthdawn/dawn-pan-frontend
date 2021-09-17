@@ -8,7 +8,7 @@
       class="toolbar"
       bordered
     >
-      <ToolBar/>
+      <tool-bar/>
     </n-layout-header>
     <n-layout position="absolute">
       <n-layout-header class="address-bar">地址/搜索</n-layout-header>

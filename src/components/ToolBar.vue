@@ -1,33 +1,34 @@
+<!--suppress HtmlUnknownAttribute -->
 <template>
   <div class="container">
     <n-button>
       上传
       <template #icon>
         <n-icon>
-          <arrow-upload20-regular/>
+          <arrow-upload20-regular />
         </n-icon>
       </template>
     </n-button>
-    <n-divider vertical/>
+    <n-divider vertical />
     <n-button-group>
       <n-button>
         <template #icon>
           <n-icon>
-            <cut20-regular/>
+            <cut20-regular />
           </n-icon>
         </template>
       </n-button>
       <n-button>
         <template #icon>
           <n-icon>
-            <copy20-regular/>
+            <copy20-regular />
           </n-icon>
         </template>
       </n-button>
       <n-button>
         <template #icon>
           <n-icon>
-            <clipboard-paste20-regular/>
+            <clipboard-paste20-regular />
           </n-icon>
         </template>
       </n-button>
@@ -36,36 +37,36 @@
       <n-button>
         <template #icon>
           <n-icon>
-            <rename20-regular/>
+            <rename20-regular />
           </n-icon>
         </template>
       </n-button>
       <n-button>
         <template #icon>
           <n-icon>
-            <share20-regular/>
+            <share20-regular />
           </n-icon>
         </template>
       </n-button>
       <n-button>
         <template #icon>
           <n-icon>
-            <delete20-regular/>
+            <delete20-regular />
           </n-icon>
         </template>
       </n-button>
     </n-button-group>
-    <n-divider vertical/>
+    <n-divider vertical />
     <n-dropdown
-      @select="handleSortSelect"
       trigger="click"
       :options="sortOptions"
       :render-icon="renderSortDropdownIcon"
+      @select="handleSortSelect"
     >
       <n-button>
         <template #icon>
           <n-icon>
-            <arrow-sort20-regular/>
+            <arrow-sort20-regular />
           </n-icon>
         </template>
         排序
@@ -74,19 +75,19 @@
           size="0.8em"
           class="btn-tail-icon"
         >
-          <chevron-down16-filled/>
+          <chevron-down16-filled />
         </n-icon>
       </n-button>
     </n-dropdown>
     <n-dropdown
-      @select="handleFilterSelect"
       trigger="click"
       :options="filterOptions"
+      @select="handleFilterSelect"
     >
       <n-button>
         <template #icon>
           <n-icon>
-            <filter20-regular/>
+            <filter20-regular />
           </n-icon>
         </template>
         筛选
@@ -95,16 +96,16 @@
           size="0.8em"
           class="btn-tail-icon"
         >
-          <chevron-down16-filled/>
+          <chevron-down16-filled />
         </n-icon>
       </n-button>
     </n-dropdown>
-    <n-divider vertical/>
+    <n-divider vertical />
 
     <n-button>
       <template #icon>
         <n-icon>
-          <more-horizontal16-regular/>
+          <more-horizontal16-regular />
         </n-icon>
       </template>
     </n-button>
@@ -126,8 +127,8 @@ import {
   MoreHorizontal16Regular,
   CircleSmall20Filled,
 } from '@vicons/fluent'
-import { h, defineComponent, ref } from 'vue'
-import { useMessage, NIcon, DropdownOption } from 'naive-ui'
+import {h, defineComponent, ref} from 'vue'
+import {useMessage, NIcon, DropdownOption} from 'naive-ui'
 
 export default defineComponent({
   name: 'ToolBar',
@@ -145,22 +146,22 @@ export default defineComponent({
     MoreHorizontal16Regular,
   },
 
-  setup () {
+  setup() {
     const message = useMessage()
     const currentSort = ref('name')
     const currentSortDirection = ref('asc')
     return {
-      handleFilterSelect (key: string) {
+      handleFilterSelect(key: string) {
         message.info(key)
       },
-      handleSortSelect (key: string) {
+      handleSortSelect(key: string) {
         if (key === 'asc' || key === 'desc') {
           currentSortDirection.value = key
         } else {
           currentSort.value = key
         }
       },
-      renderSortDropdownIcon (option: DropdownOption) {
+      renderSortDropdownIcon(option: DropdownOption) {
         if (option.key === currentSort.value || option.key === currentSortDirection.value) {
           return h(NIcon, null, {
             default: () => h(CircleSmall20Filled),
@@ -169,7 +170,7 @@ export default defineComponent({
       },
     }
   },
-  data () {
+  data() {
     return {
       filterOptions: [
         {
