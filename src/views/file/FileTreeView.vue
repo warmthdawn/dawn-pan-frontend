@@ -1,58 +1,52 @@
 <template>
   <div class="container">
     <n-tree
+      v-model:checked-keys="checkedKeys"
+      v-model:expanded-keys="expandedKeys"
       block-line
       remote
       virtual-scroll
       class="tree"
       :data="data"
-      :checked-keys="checkedKeys"
       :on-load="handleLoad"
-      :expanded-keys="expandedKeys"
-      @update:checked-keys="handleCheckedKeysChange"
-      @update:expanded-keys="handleExpandedKeysChange"
     />
   </div>
 </template>
 
 <script lang="ts">
 import {defineComponent, ref} from "vue";
+import {NTree} from 'naive-ui'
+import {TreeOption} from "naive-ui/lib/tree/src/interface";
 function createData () {
   return [
     {
-      label: nextLabel(),
-      key: 1,
+      label: '快速访问',
+      key: 'fast',
       isLeaf: false,
     },
     {
-      label: nextLabel(),
-      key: 2,
+      label: '我的网盘',
+      key: 'root',
+      isLeaf: false,
+    },
+    {
+      label: '我的分享',
+      key: 'share',
+      isLeaf: false,
+    },
+    {
+      label: '回收站',
+      key: 'recycle',
       isLeaf: false,
     },
   ]
 }
 
-function nextLabel (currentLabel) {
-  if (!currentLabel) return '道生一'
-  if (currentLabel === '道生一') return '一生二'
-  if (currentLabel === '一生二') return '二生三'
-  if (currentLabel === '二生三') return '三生万物'
-  if (currentLabel === '三生万物') return '道生一'
-}
-
-function findSiblingsAndIndex (node, nodes) {
-  if (!nodes) return [null, null]
-  for (let i = 0; i < nodes.length; ++i) {
-    const siblingNode = nodes[i]
-    if (siblingNode.key === node.key) return [nodes, i]
-    const [siblings, index] = findSiblingsAndIndex(node, siblingNode.children)
-    if (siblings) return [siblings, index]
-  }
-  return [null, null]
-}
-
 export default defineComponent({
   name: 'FileTreeView',
+  components: {
+    NTree,
+  },
   setup () {
     const expandedKeysRef = ref([])
     const checkedKeysRef = ref([])
@@ -62,43 +56,17 @@ export default defineComponent({
       data: dataRef,
       expandedKeys: expandedKeysRef,
       checkedKeys: checkedKeysRef,
-      handleExpandedKeysChange (expandedKeys) {
-        expandedKeysRef.value = expandedKeys
-      },
-      handleCheckedKeysChange (checkedKeys) {
-        checkedKeysRef.value = checkedKeys
-      },
-      handleLoad (node) {
+      handleLoad (node: TreeOption) {
         return new Promise((resolve, reject) => {
           setTimeout(() => {
             node.children = [
               {
-                label: nextLabel(node.label),
-                key: node.key + nextLabel(node.label) + '1',
-                isLeaf: false,
-              },
-              {
-                label: nextLabel(node.label),
-                key: node.key + nextLabel(node.label) + '2',
-                isLeaf: false,
-              },
-              {
-                label: nextLabel(node.label),
-                key: node.key + nextLabel(node.label) + '3',
-                isLeaf: false,
-              },
-              {
-                label: nextLabel(node.label),
-                key: node.key + nextLabel(node.label) + '4',
-                isLeaf: false,
-              },
-              {
-                label: nextLabel(node.label),
-                key: node.key + nextLabel(node.label) + '5',
-                isLeaf: false,
+                label: '新建文件夹',
+                key: Number(node.key) + 10,
+                isLeaf: true,
               },
             ]
-            resolve()
+            resolve(null)
           }, 1000)
         })
       },

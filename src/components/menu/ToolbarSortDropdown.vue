@@ -8,10 +8,10 @@
     <n-button>
       <template #icon>
         <n-icon>
-          <filter20-regular />
+          <arrow-sort20-regular />
         </n-icon>
       </template>
-      筛选
+      排序
       <n-icon
         depth="3"
         size="0.8em"
@@ -26,7 +26,7 @@
 <script lang="ts">
 import {computed, defineComponent, h, ref, toRefs} from 'vue'
 import {
-  Filter20Regular,
+  ArrowSort20Regular,
   ChevronDown16Filled,
   CircleSmall20Filled,
 } from '@vicons/fluent'
@@ -35,7 +35,7 @@ import {DropdownOption, NButton, NIcon} from 'naive-ui'
 export default defineComponent({
   name: "ToolbarFilterDropdown",
   components: {
-    Filter20Regular,
+    ArrowSort20Regular,
     NButton,
     ChevronDown16Filled,
   },

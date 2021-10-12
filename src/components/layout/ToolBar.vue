@@ -1,13 +1,6 @@
 <template>
   <div class="container">
-    <n-button type="primary">
-      上传
-      <template #icon>
-        <n-icon>
-          <arrow-upload20-regular />
-        </n-icon>
-      </template>
-    </n-button>
+    <upload-button />
     <n-divider vertical />
     <n-button-group>
       <n-button>
@@ -91,10 +84,12 @@ import {
   Rename20Regular,
   MoreHorizontal16Regular,
 } from '@vicons/fluent'
+import UploadButton from "../file/UploadButton.vue";
 
 export default defineComponent({
   name: 'ToolBar',
   components: {
+    UploadButton,
     ToolbarFilterDropdown,
     ToolbarSortDropdown,
     ArrowUpload20Regular,
