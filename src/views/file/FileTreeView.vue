@@ -1,12 +1,13 @@
 <template>
   <div class="container">
     <n-tree
-      v-model:checked-keys="checkedKeys"
       v-model:expanded-keys="expandedKeys"
       block-line
       remote
       virtual-scroll
       class="tree"
+      @update:selected-keys="handleSelect"
+      :selected-keys="selectedKeys"
       :data="data"
       :on-load="handleLoad"
     />
@@ -14,32 +15,14 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from "vue";
+import {computed, defineComponent, ref, watch} from "vue";
+import {FileTreeItem, getDirectoryRoot, getSubDirectories} from '../../api/file'
 import {NTree} from 'naive-ui'
 import {TreeOption} from "naive-ui/lib/tree/src/interface";
-function createData () {
-  return [
-    {
-      label: '快速访问',
-      key: 'fast',
-      isLeaf: false,
-    },
-    {
-      label: '我的网盘',
-      key: 'root',
-      isLeaf: false,
-    },
-    {
-      label: '我的分享',
-      key: 'share',
-      isLeaf: false,
-    },
-    {
-      label: '回收站',
-      key: 'recycle',
-      isLeaf: false,
-    },
-  ]
+import {useStore} from "vuex";
+
+async function createData() {
+  return await getDirectoryRoot();
 }
 
 export default defineComponent({
@@ -47,30 +30,47 @@ export default defineComponent({
   components: {
     NTree,
   },
-  setup () {
+  setup() {
     const expandedKeysRef = ref([])
-    const checkedKeysRef = ref([])
-    const dataRef = ref(createData())
+    const dataRef = ref([] as Array<FileTreeItem>)
+    createData().then(it => {
+      dataRef.value = it;
+    })
+
+    const store = useStore();
+    const selectedRef = computed(() => {
+      return [store.state.currentDirectory];
+    })
 
     return {
       data: dataRef,
       expandedKeys: expandedKeysRef,
-      checkedKeys: checkedKeysRef,
-      handleLoad (node: TreeOption) {
-        return new Promise((resolve, reject) => {
-          setTimeout(() => {
-            node.children = [
-              {
-                label: '新建文件夹',
-                key: Number(node.key) + 10,
-                isLeaf: true,
-              },
-            ]
-            resolve(null)
-          }, 1000)
+      selectedKeys: selectedRef,
+      async handleLoad(node: TreeOption) {
+        const subDir = await getSubDirectories(node.key as (string | number));
+        node.children = subDir.map(it => {
+          return {
+            label: it.label,
+            key: it.key,
+            isLeaf: it.isLeaf,
+          }
         })
       },
+
+      handleSelect(keys: Array<number>) {
+        if (keys.length > 0) {
+          store.commit("changeDirectory", keys[0])
+        }
+      },
+
+
     }
+  },
+
+  mounted() {
+    this.$store.watch(state => state.updateIndex, (newVal) => {
+      this.data.forEach(it => it.children = []);
+    });
   },
 })
 </script>
@@ -81,6 +81,7 @@ export default defineComponent({
   box-sizing border-box
   padding 24px 0
   padding-left 24px
+
   .tree
     height 100%
 </style>

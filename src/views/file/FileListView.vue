@@ -15,43 +15,48 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, h, reactive, ref} from "vue";
+import {defineComponent, h, reactive, Ref, ref} from "vue";
 import {useMessage} from "naive-ui";
 import {Folder20Filled} from "@vicons/fluent";
 import FileName from "../../components/file/FileName.vue";
+import {RowData} from "naive-ui/lib/data-table/src/interface";
+import {DateTime} from "luxon";
+import {listDirectory} from "../../api/file";
+import {useStore} from "vuex";
+import {State} from "@vue/runtime-core";
+
 
 interface FileRow {
-  type: string,
+  type: 'folder' | 'file',
   name: string,
+  key: string,
+}
+
+interface FileRowFile extends FileRow {
+  type: 'file',
   size: number,
-  key: number,
-  modify_time: number,
+  modify_time: DateTime,
   file_type: string,
   ext: string,
 }
 
+interface FileRowDirectory extends FileRow {
+  type: 'folder',
+}
+
+
 export default defineComponent({
   name: "FileListView",
-
-  data() {
-    return {
-      sort: {
-        key: 'name',
-        direction: 'ascend',
-      },
-      files: [],
-      loading: false,
-    }
-  },
   setup() {
     const message = useMessage()
-    const checkedRowsRef: ref<number[]> = ref([])
+    const store = useStore();
+    const checkedRowsRef: Ref<string[]> = ref([])
     return {
       rowProps(row: FileRow) {
         return {
           style: 'cursor: pointer;',
-          onClick: (ev) => {
-            if (ev.target.className && ev.target.className.includes('n-checkbox-box')) {
+          onClick: (ev: any) => {
+            if (ev.target && ev.target.className && ev.target.className.includes('n-checkbox-box')) {
               return;
             }
             const index = checkedRowsRef.value.indexOf(row.key)
@@ -63,7 +68,10 @@ export default defineComponent({
             }
           },
           onDblclick: () => {
-            message.info(row.name)
+            if (row.type === "folder") {
+              const key = parseInt(row.key.substr(1));
+              store.commit("changeDirectory", key)
+            }
           },
         }
       },
@@ -79,18 +87,18 @@ export default defineComponent({
             {
               label: '全选',
               key: 'all',
-              onSelect: (pageData) => {
+              onSelect: (pageData: RowData) => {
                 checkedRowsRef.value = pageData
-                  .map((row) => row.key)
+                  .map((row: FileRow) => row.key)
               },
             },
             {
               label: '反选',
               key: 'reverse',
-              onSelect: (pageData) => {
+              onSelect: (pageData: RowData) => {
                 checkedRowsRef.value = pageData
-                  .map((row) => row.key)
-                  .filter(it => !checkedRowsRef.value.includes(it))
+                  .map((row: FileRow) => row.key)
+                  .filter((it: string) => !checkedRowsRef.value.includes(it))
               },
             },
             {
@@ -137,27 +145,39 @@ export default defineComponent({
             if (row.type === 'folder') {
               return ''
             }
-            if (row.size === null || row.size < 1000) {
+            const file = row as FileRowFile;
+            if (!file.size || file.size < 1000) {
               return '<1 KB'
             }
-            if (row.size < 1024 * 1024) {
-              return `${Math.round(row.size / 1024)} KB`
+            if (file.size < 1024 * 1024) {
+              return `${Math.round(file.size / 1024)} KB`
             }
 
-            if (row.size < 1000 * 1024 * 1024) {
-              return `${(row.size / 1024 / 1024).toPrecision(4)} MB`
+            if (file.size < 1000 * 1024 * 1024) {
+              return `${(file.size / 1024 / 1024).toPrecision(4)} MB`
             }
 
-            if (row.size < 1000 * 1024 * 1024 * 1024) {
-              return `${(row.size / 1024 / 1024 / 1024).toPrecision(4)} GB`
+            if (file.size < 1000 * 1024 * 1024 * 1024) {
+              return `${(file.size / 1024 / 1024 / 1024).toPrecision(4)} GB`
             }
-            return `${(row.size / 1024 / 1024 / 1024 / 1024).toPrecision(4)} TB`
+            return `${(file.size / 1024 / 1024 / 1024 / 1024).toPrecision(4)} TB`
           },
         }, {
           width: 20,
         },
       ],
     };
+  },
+
+  data() {
+    return {
+      sort: {
+        key: 'name',
+        direction: 'ascend',
+      },
+      files: [] as Array<FileRow>,
+      loading: false,
+    }
   },
   watch: {
     sort(val) {
@@ -166,9 +186,16 @@ export default defineComponent({
   },
   mounted() {
     this.loadData();
+
+    this.$store.watch(state => state.currentDirectory, (newVal) => {
+      this.loadData(newVal >= 0 ? newVal : undefined);
+    });
+    this.$store.watch(state => state.updateIndex, (newVal) => {
+      this.loadData(this.$store.state.currentDirectory >= 0 ? newVal : undefined);
+    });
   },
   methods: {
-    sortFiles(val, data) {
+    sortFiles(val: { key?: string, direction?: 'ascend' | 'descend' }, data: Array<FileRow>) {
       val = val || {}
       const dir = val.direction !== 'descend' ? 1 : -1;
       if (!data) {
@@ -180,44 +207,24 @@ export default defineComponent({
             return -1000 * dir
           return 1000 * dir
         }
-        if (this.sortKey === 'size') {
-          return (a.size - b.size) * dir
-        }
-        if (this.sortKey === 'modify_time') {
-          return (a.modify_time - b.modify_time) * dir
-        }
-        if (this.sortKey === 'file_type') {
-          return a.file_type.localeCompare(b.file_type) * dir
+        if (a.type !== 'folder') {
+          if (val.key === 'size') {
+            return ((a as FileRowFile).size - (b as FileRowFile).size) * dir
+          }
+          if (val.key === 'modify_time') {
+
+            return ((a as FileRowFile).modify_time.toMillis() - (b as FileRowFile).modify_time.toMillis()) * dir
+          }
+          if (val.key === 'file_type') {
+            return (a as FileRowFile).file_type.localeCompare((b as FileRowFile).file_type) * dir
+          }
         }
         return a.name.localeCompare(b.name) * dir
       });
     },
-    async loadData() {
+    async loadData(directory?: number) {
       this.loading = true;
-      const data = [{
-        name: 'Pictures',
-        type: 'folder',
-        key: '1',
-      },
-        {
-          name: 'Document',
-          type: 'folder',
-          key: '2',
-        },
-        {
-          name: 'Music',
-          type: 'folder',
-          key: '3',
-        },
-        {
-          name: '作业.doc',
-          type: 'file',
-          key: '4',
-          size: 50000,
-          file_type: '文本文件',
-          modify_time: '2020-11-4',
-        },
-      ]
+      const data = await listDirectory(directory) as Array<FileRow>;
       this.sortFiles({}, data);
       this.files = data;
       this.loading = false;

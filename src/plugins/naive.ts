@@ -3,7 +3,7 @@ import {
   NLayout, NLayoutContent, NLayoutFooter, NLayoutHeader, NLayoutSider,
   NSpace, NButton, NDivider, NIcon, NButtonGroup, NMessageProvider, NDropdown,
   NBreadcrumb, NBreadcrumbItem, NInput, NInputGroup, NTree, NDataTable,
-  NUpload, NUploadTrigger, NUploadFileList, NCard,
+  NUpload, NUploadTrigger, NUploadFileList, NCard, NModal,
 } from 'naive-ui'
 
 export default create({
@@ -30,5 +30,6 @@ export default create({
     NUploadTrigger,
     NUploadFileList,
     NCard,
+    NModal,
   ],
 })

@@ -3,7 +3,9 @@
   <n-upload
     v-model:file-list="uploading"
     abstract
-    action="https://www.mocky.io/v2/5e4bafc63100007100d8b70f"
+    action="http://localhost:5000/api/upload"
+    :data="getData"
+    @finish="$store.commit('refresh')"
   >
 
     <n-upload-trigger
@@ -39,6 +41,8 @@
 <script lang="ts">
 import {defineComponent} from "vue";
 import {ArrowUpload20Regular} from "@vicons/fluent";
+import {UploadFileInfo} from "naive-ui";
+import {loadFileHash} from "../../utils/shautils";
 
 export default defineComponent({
   name: "UploadButton",
@@ -47,15 +51,20 @@ export default defineComponent({
   },
   data() {
     return {
-      uploading: [
-        {
-          id: 'b',
-          name: 'file.doc',
-          status: 'finished',
-          type: 'text/plain',
-        },
-      ],
+      uploading: [],
     }
+  },
+  methods: {
+    getData(file: UploadFileInfo) {
+      const fileObj = (file as any).file.file
+      const hash = loadFileHash(fileObj)
+      console.log(hash);
+      return {
+        uploadDirectory: this.$store.state.currentDirectory,
+        hash: hash,
+        fileName: file.file?.name,
+      };
+    },
   },
 });
 </script>

@@ -59,6 +59,14 @@
     />
     <n-divider vertical />
 
+    <n-button @click="newFolder">
+      <template #icon>
+        <n-icon>
+          <add-circle24-regular />
+        </n-icon>
+      </template>
+      新建文件夹
+    </n-button>
     <n-button>
       <template #icon>
         <n-icon>
@@ -66,6 +74,11 @@
         </n-icon>
       </template>
     </n-button>
+
+    <RenameModal
+      v-model:show="showCreate"
+      type="create"
+    />
   </div>
 </template>
 
@@ -75,7 +88,7 @@ import {NButton} from 'naive-ui'
 import ToolbarSortDropdown from "../menu/ToolbarSortDropdown.vue";
 import ToolbarFilterDropdown from "../menu/ToolbarFilterDropdown.vue";
 import {
-  ArrowUpload20Regular,
+  AddCircle24Regular,
   Copy20Regular,
   ClipboardPaste20Regular,
   Cut20Regular,
@@ -85,14 +98,16 @@ import {
   MoreHorizontal16Regular,
 } from '@vicons/fluent'
 import UploadButton from "../file/UploadButton.vue";
+import RenameModal from "../file/RenameModal.vue";
 
 export default defineComponent({
   name: 'ToolBar',
   components: {
+    RenameModal,
     UploadButton,
     ToolbarFilterDropdown,
     ToolbarSortDropdown,
-    ArrowUpload20Regular,
+    AddCircle24Regular,
     Copy20Regular,
     ClipboardPaste20Regular,
     Cut20Regular,
@@ -109,7 +124,14 @@ export default defineComponent({
       isDesc: false,
       filter: '',
       possibleExtensions: ['txt', 'jpg', 'exe'],
+      showCreate: false,
     }
+  },
+
+  methods: {
+    newFolder() {
+      this.showCreate = true;
+    },
   },
 })
 </script>
